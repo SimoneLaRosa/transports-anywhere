@@ -1,0 +1,46 @@
+import tkinter as tk
+import subprocess
+
+file_path1=r"C:\Users\"
+file_path2=r"C:\Users\"
+file_path3 =r"C:\Users\"
+file_path4=r"C:\Users\n"
+
+def pivot_TMSpropose():
+   subprocess.run(["python", file_path1])
+
+def pivot_SAPexport():
+   subprocess.run(["python", file_path2])
+
+def vehicle_maker():
+    subprocess.run(["python", file_path3])
+
+def vehicle_generation():
+    subprocess.run(["python", file_path4])
+
+# Crea la finestra principale dell'interfaccia grafica
+finestra = tk.Tk()
+
+# Imposta il colore di sfondo della finestra
+finestra.configure(bg="black")
+
+# Imposta il titolo della finestra
+finestra.title("Optimized Vehicle Generation Model // Simone La Rosa")
+
+# Imposta le dimensioni della finestra
+finestra.geometry("500x100")  # Larghezza x Altezza
+
+# Crea i pulsanti nella finestra
+pulsante_1 = tk.Button(finestra, text="1. Veicoli proposti TMS", command=pivot_TMSpropose, fg="green")
+pulsante_2 = tk.Button(finestra, text="2. Stock SAP veicoli TMS", command=pivot_SAPexport, fg="green")
+pulsante_3 = tk.Button(finestra, text="3. Ricerca dimensioni item", command=vehicle_maker, fg="green")
+pulsante_4 = tk.Button(finestra, text="4. Genera veicoli ottimali", command=vehicle_generation, fg="green")
+
+# Posiziona i pulsanti nella finestra
+pulsante_1.grid(row=1, column=0, padx=10, pady=10)
+pulsante_2.grid(row=1, column=1, padx=10, pady=10)
+pulsante_3.grid(row=2, column=0, padx=10, pady=10)
+pulsante_4.grid(row=2, column=1, padx=10, pady=10)
+
+# Avvia il ciclo principale dell'interfaccia grafica
+finestra.mainloop()
