@@ -1,0 +1,40 @@
+import pandas as pd
+import os
+import openpyxl
+
+# Percorso del file Excel di origine
+file_origine = r'C:\\Users\\.xlsx'
+
+# Percorso del file Excel di destinazione
+file_destinazione = r'C:\Users\.xlsx'
+
+# Nome del foglio di origine
+foglio_origine = 'name'
+
+# Nome del foglio di destinazione
+foglio_destinazione = 'name2'
+
+# Colonna di origine da cercare nel file destinazione
+colonna_origine_file_destinazione = 'Product Code'
+
+colonna_origine_file_origine= 'Product Code'
+
+# Colonna di destinazione da restituire
+colonna_destinazione_file_destinazione = 'VOLUME'
+
+# Carica i dati dal file di origine senza intestazioni di colonna
+df_origine = pd.read_excel(file_origine, sheet_name=foglio_origine)
+
+# Carica i dati dal file di destinazione
+df_destinazione = pd.read_excel(file_destinazione, sheet_name=foglio_destinazione)
+
+# Itera sui valori della colonna di origine del file di origine
+for i, valore_origine in enumerate(df_origine[colonna_origine_file_origine], start=0):
+    # Cerca il valore nel file di destinazione
+    filtro = df_destinazione[colonna_origine_file_destinazione] == valore_origine
+    valori_corrispondenti = df_destinazione.loc[filtro, colonna_destinazione_file_destinazione]
+    if not valori_corrispondenti.empty:
+        # Assegna il valore corrispondente nella colonna "Volume" del file di origine
+        df_origine.at[i, 'Volume'] = valori_corrispondenti.values[0]
+
+
