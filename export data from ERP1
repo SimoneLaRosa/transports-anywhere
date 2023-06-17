@@ -1,0 +1,41 @@
+import os
+import glob
+import pandas as pd
+import openpyxl
+import re
+
+# Trova il file più recente nella cartella
+folder_path = 'C:\\Users\\\\'
+files = os.listdir(folder_path)
+if not files:
+    print("La cartella è vuota.")
+    exit()
+
+ultimo_file = max(files)
+file_path = os.path.join(folder_path, ultimo_file)
+
+# Carica il file di lavoro Excel utilizzando pandas
+df_origine = pd.read_excel(file_path)
+
+# Rimuovi il testo dalla colonna "SKU" utilizzando espressione regolare
+df_origine['SKU'] = df_origine['SKU'].apply(lambda x: re.findall(r'\d+', str(x))[0])
+
+# Crea la Pivot Table
+pivot_table = pd.pivot_table(df_origine, values="Quantità SKU", index=["SKU"])
+
+# Apri il file di lavoro Excel di destinazione
+wb_destinazione = openpyxl.load_workbook("C:\\.xlsx")
+
+# Specifica il foglio di lavoro di destinazione
+nome_foglio_destinazione = "name"
+ws_destinazione = wb_destinazione[nome_foglio_destinazione]
+
+# Rimuovi i dati precedenti nel foglio di lavoro di destinazione
+ws_destinazione.delete_rows(2, ws_destinazione.max_row)
+
+# Scrivi la Pivot Table nel foglio di lavoro di destinazione
+for row in pivot_table.iterrows():
+    values = [row[0], row[1]['Quantità SKU']]
+    ws_destinazione.append(values)
+
+
