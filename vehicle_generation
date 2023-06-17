@@ -1,0 +1,72 @@
+import pandas as pd
+from openpyxl import load_workbook
+import os
+
+# Percorso del file Excel di origine
+file_origine = r'C:\\Users\\.xlsx'
+# Nome del foglio di origine
+foglio_origine = 'name'
+
+# Leggi i dati dal file Excel
+df = pd.read_excel(file_origine, sheet_name=foglio_origine)
+prodotti = df[["Product Code", "Volume", "Qty"]].to_dict("records")
+
+def pianificazione_veicoli(prodotti):
+    veicoli_pianificati = []
+    veicolo_corrente = []
+    volume_corrente = 0
+
+    for prodotto in prodotti:
+        product_code = prodotto["Product Code"]
+        volume_prodotto = prodotto["Volume"]
+        qty = prodotto["Qty"]
+
+        qty_rimanente = qty
+
+        while qty_rimanente > 0:
+            if volume_corrente + (volume_prodotto * qty_rimanente) <= 55:
+                veicolo_corrente.append({"Product Code": product_code, "Volume": volume_prodotto, "Qty": qty_rimanente})
+                volume_corrente += volume_prodotto * qty_rimanente
+                qty_rimanente = 0
+            else:
+                qty_optim = max(min(qty_rimanente, (55 - volume_corrente) // volume_prodotto), 1)
+                veicolo_corrente.append({"Product Code": product_code, "Volume": volume_prodotto, "Qty": qty_optim})
+                volume_corrente += volume_prodotto * qty_optim
+                qty_rimanente -= qty_optim
+
+                veicoli_pianificati.append((veicolo_corrente, volume_corrente))
+                veicolo_corrente = []
+                volume_corrente = 0
+
+    if veicolo_corrente:
+        veicoli_pianificati.append((veicolo_corrente, volume_corrente))
+
+    return veicoli_pianificati
+
+# Genera la pianificazione dei veicoli
+pianificazione = pianificazione_veicoli(prodotti)
+
+# Carica il file Excel
+workbook = load_workbook(file_origine)
+
+# Seleziona il foglio "name"
+sheet = workbook[foglio_origine]
+
+# Aggiungi i risultati alla tabella esistente a partire dalla colonna 16
+start_column = 16
+current_row = 1
+
+veicolo_count = 1
+for veicolo, volume in pianificazione:
+    veicolo_name = f"Veicolo{veicolo_count}"
+    prodotti_veicolo = [(prodotto["Product Code"], prodotto["Qty"]) for prodotto in veicolo]
+
+    sheet.cell(row=current_row, column=start_column).value = veicolo_name
+    sheet.cell(row=current_row, column=start_column+1).value = volume
+    for i, (product_code, qty) in enumerate(prodotti_veicolo, start=1):
+        sheet.cell(row=current_row + i, column=start_column).value = product_code
+        sheet.cell(row=current_row + i, column=start_column + 1).value = qty
+
+    current_row += len(prodotti_veicolo) + 1
+    veicolo_count += 1
+
